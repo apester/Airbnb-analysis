@@ -1,0 +1,104 @@
+annotations=[]
+for row in graph_counts.iter_rows():
+    left_text,right_text,left_x,right_x,city=row
+    annotations.append(dict(x=right_text, y=city, text=left_text,showarrow=False,font=dict(color="grey",weight='bold')))
+    annotations.append(dict(x=right_x, y=city, text=left_x,showarrow=False,font=dict(color="grey",weight='bold')))
+
+legend_annotation_text=["1","2","+2","+5","+10","+100"]
+legend_annotation_pos=[-16,-3,5,15,40,65]
+annotations_legend=[
+    dict(x=x, y=14.5, text=text, showarrow=True, ax=0, ay=-20,arrowhead=2,font=dict(color=palettecolor,weight='bold'))
+    for x, text,palettecolor in zip(legend_annotation_pos, legend_annotation_text,palette)
+]
+
+annotations.extend(annotations_legend)
+
+text_annotation=['Number of properties','Cities with strict Airbnb Regulations']
+text_annotation_xpos=[-40,-75]
+text_annotation_ypos=[15,5.75]
+annotations_text=[
+    dict(x=x,y=y,text=text,showarrow=False,font=dict(color="grey",weight='bold'))
+    for x,y,text in zip(text_annotation_xpos,text_annotation_ypos,text_annotation)
+    
+]
+annotations.extend(annotations_text)
+
+subtitle_annotation=['Individual','Professional']
+subtitle_annotation_xpos=[-50,50]
+subtitle_annotation_ypos=[16,16]
+subtitle_colors=['#7ba591','#faa41b']
+annotations_subtitle=[
+    dict(x=x,y=y,text=text,showarrow=False,font=dict(color=color,size=16))
+    for x,y,text,color in zip(subtitle_annotation_xpos,subtitle_annotation_ypos,subtitle_annotation,subtitle_colors)
+    
+]
+annotations.extend(annotations_subtitle)
+
+city_order=graph_counts.sort('left_text')['city']
+palette=["#537c78","#7ba591","#cc222b","#f15b4c","#faa41b","#ffd45b"]
+
+fig = px.bar(df_combined, x="percentage", y="city", orientation='h',color='binned_counts',
+            #color_discrete_sequence=px.colors.sequential.Agsunset,
+             color_discrete_sequence=palette,
+            category_orders={"binned_counts": ["2", "1", "+2","+5","+10","+100"],'city':city_order})
+
+fig.update_layout(
+    height=700,
+    width=1100,
+    template='plotly_white',
+    annotations=annotations,
+    bargap=0.3,
+    margin_b=10,
+    margin_t=70,
+    xaxis_title="",
+    yaxis_title="",
+    title=dict(text="Who is your Airbnb host?<br><sup>% of airbnb listings in European cities owned by single/multiproperty hosts</sup>",font=dict(size=30)),
+    font=dict(
+        family="Franklin Gothic"),
+    legend=dict(
+        orientation='h',
+        x=0.5,
+        y=-0.085,
+        xanchor='center',
+        yanchor='bottom',
+        title="Number of properties per host"
+    )
+)
+fig.update_xaxes(
+    tickvals=[-75,-50,-25,0,25,50,75,100],
+    ticktext=["75%","50%","25%","0","25%","50%","75%","100%"],
+    side='bottom',
+    griddash='dash')
+    
+fig.update_yaxes(anchor='free',shift=10,
+                tickfont=dict(size=18,weight='normal'))
+
+fig.add_shape(
+    type="line",
+    x0=-95,  
+    x1=90, 
+    y0=5.5,
+    y1=5.5, 
+    line=dict(color="lightgrey",width=2,dash='dot')  
+)
+
+fig.add_shape(
+    type="rect",
+    x0=-95,
+    x1=90,
+    y0=-0.5,
+    y1=5.5,
+    fillcolor="rgba(211, 211, 211, 0.2)",
+    line=dict(width=0)
+)
+
+fig.add_shape(
+    type="line",
+    x0=0,  
+    x1=0, 
+    y0=-0.5,
+    y1=15.25, 
+    line=dict(color="grey",width=2,dash='solid')  
+)
+
+fig.show()
